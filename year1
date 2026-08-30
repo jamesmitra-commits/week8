@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full overflow-hidden">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fun Computer World - Year 1 Interactive Lesson & Games</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts for playful typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700;800&family=Quicksand:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        html, body {
+            height: 100%;
+            max-height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            font-family: 'Fredoka', 'Quicksand', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #fef3c7 50%, #e0e7ff 100%);
+        }
+        .bouncy {
+            animation: bounce 2s infinite ease-in-out;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .pulse-target {
+            animation: pulseBox 2s infinite ease-in-out;
+        }
+        @keyframes pulseBox {
+            0%, 100% { border-color: #f59e0b; transform: scale(1); }
+            50% { border-color: #d97706; transform: scale(1.02); }
+        }
+        .draggable-card {
+            cursor: grab;
+            touch-action: none;
+        }
+        .draggable-card:active {
+            cursor: grabbing;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col justify-between p-2 md:p-4 text-slate-800 overflow-hidden box-border">
+
+    <!-- Top Compact Navigation Header -->
+    <header class="w-full max-w-7xl mx-auto bg-white/95 backdrop-blur-md rounded-2xl px-3 py-2 md:px-5 md:py-2 flex flex-row justify-between items-center shrink-0 gap-2 shadow-lg border-2 md:border-4 border-yellow-300">
+        <div class="flex items-center gap-2 md:gap-3">
+            <span class="text-3xl md:text-5xl bouncy">🖥️</span>
+            <div>
+                <h1 class="text-base md:text-2xl font-extrabold text-sky-600 tracking-wide leading-tight">Computer World!</h1>
+                <p class="text-xs md:text-sm font-bold text-amber-500 hidden sm:block">Year 1 Types & Functions</p>
+            </div>
+        </div>
+
+        <!-- Mode Switcher Tabs -->
+        <nav class="flex gap-1.5 md:gap-3">
+            <button id="tab-slides" onclick="switchMode('slides')" class="px-3 py-1.5 md:px-5 md:py-2 rounded-xl font-extrabold text-xs md:text-base text-white bg-sky-500 hover:bg-sky-600 transition shadow flex items-center gap-1.5">
+                <span>📖</span> <span class="hidden sm:inline">Lesson</span>
+            </button>
+            <button id="tab-matching" onclick="switchMode('matching')" class="px-3 py-1.5 md:px-5 md:py-2 rounded-xl font-extrabold text-xs md:text-base text-slate-700 bg-amber-100 hover:bg-amber-200 transition shadow flex items-center gap-1.5">
+                <span>🧩</span> <span class="hidden sm:inline">Drag & Match</span>
+            </button>
+            <button id="tab-quiz" onclick="switchMode('quiz')" class="px-3 py-1.5 md:px-5 md:py-2 rounded-xl font-extrabold text-xs md:text-base text-slate-700 bg-emerald-100 hover:bg-emerald-200 transition shadow flex items-center gap-1.5">
+                <span>⭐</span> <span class="hidden sm:inline">Riddles</span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER - Strictly bound within viewport height -->
+    <main class="w-full max-w-7xl mx-auto flex-1 min-h-0 flex flex-col my-1 md:my-2 overflow-hidden">
+
+        <!-- ================= MODE 1: LESSON PRESENTATION SLIDES ================= -->
+        <section id="section-slides" class="flex-1 min-h-0 bg-white/95 rounded-2xl md:rounded-3xl p-3 md:p-5 shadow-xl border-2 md:border-4 border-sky-200 flex flex-col justify-between overflow-hidden">
+            <!-- Slide Header / Badge -->
+            <div class="flex justify-between items-center border-b-2 border-dashed border-sky-200 pb-2 shrink-0">
+                <span id="slide-badge" class="bg-sky-100 text-sky-800 font-extrabold px-3 py-1 md:px-5 md:py-1.5 rounded-full text-xs md:text-base">
+                    Slide 1 of 8
+                </span>
+                <div id="slide-dots" class="flex gap-1.5"></div>
+            </div>
+
+            <!-- Dynamic Slide Content -->
+            <div id="slide-content" class="flex-1 min-h-0 flex flex-col justify-center items-center text-center my-2 overflow-hidden">
+                <!-- Populated via JS -->
+            </div>
+
+            <!-- Slide Nav Buttons -->
+            <div class="flex justify-between items-center pt-2 border-t-2 border-dashed border-sky-200 shrink-0">
+                <button id="btn-prev-slide" onclick="changeSlide(-1)" class="px-4 py-2 md:px-6 md:py-2.5 rounded-xl font-extrabold bg-slate-200 text-slate-700 hover:bg-slate-300 transition flex items-center gap-1.5 text-sm md:text-xl">
+                    ⬅️ Back
+                </button>
+                <button id="btn-next-slide" onclick="changeSlide(1)" class="px-5 py-2 md:px-8 md:py-2.5 rounded-xl font-extrabold bg-sky-500 text-white hover:bg-sky-600 transition shadow flex items-center gap-1.5 text-sm md:text-xl">
+                    Next ➡️
+                </button>
+            </div>
+        </section>
+
+
+        <!-- ================= MODE 2: DRAG & DROP MATCHING QUIZ (1 Q / Slide) ================= -->
+        <section id="section-matching" class="hidden flex-1 min-h-0 bg-white/95 rounded-2xl md:rounded-3xl p-3 md:p-5 shadow-xl border-2 md:border-4 border-amber-200 flex flex-col justify-between overflow-hidden">
+            <!-- Header -->
+            <div id="matching-header" class="flex justify-between items-center border-b-2 border-dashed border-amber-200 pb-2 shrink-0">
+                <div>
+                    <span class="bg-amber-100 text-amber-900 font-extrabold px-3 py-1 rounded-full text-xs md:text-sm">
+                        Activity 1: Drag & Drop Matcher 🧩
+                    </span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span id="matching-slide-num" class="font-extrabold text-slate-600 text-xs md:text-base">Question 1 of 5</span>
+                    <div id="matching-progress-dots" class="flex gap-1"></div>
+                </div>
+            </div>
+
+            <!-- Active Drag & Drop Area -->
+            <div id="matching-container" class="flex-1 min-h-0 flex flex-col justify-between my-1 overflow-hidden">
+                
+                <!-- Question Prompt Banner with Integrated Drop Box Zone -->
+                <div class="bg-gradient-to-r from-amber-400 to-orange-400 text-white p-2 md:p-4 rounded-2xl shadow-md border-2 border-amber-300 shrink-0 flex flex-col md:flex-row items-center justify-between gap-2">
+                    <div class="flex-1 text-center md:text-left">
+                        <span class="text-xs uppercase font-extrabold tracking-wider text-amber-100 block">Question Prompt</span>
+                        <p id="matching-prompt-text" class="text-sm md:text-xl font-extrabold leading-tight">
+                            Loading question...
+                        </p>
+                    </div>
+
+                    <!-- DROP TARGET BOX -->
+                    <div id="drop-target-zone" 
+                         ondragover="handleDragOver(event)" 
+                         ondragleave="handleDragLeave(event)" 
+                         ondrop="handleDrop(event)"
+                         class="w-full md:w-64 h-20 md:h-24 border-4 border-dashed border-white/90 bg-amber-500/40 rounded-2xl flex flex-col items-center justify-center text-center transition-all pulse-target shrink-0 p-1">
+                        <!-- Default state text or dropped picture card -->
+                        <span id="drop-zone-placeholder" class="text-xs md:text-sm font-extrabold text-white text-center leading-tight">
+                            📥 DRAG ANSWER HERE<br><span class="text-[10px] md:text-xs text-amber-100 font-semibold">(or tap card below)</span>
+                        </span>
+                        <div id="drop-zone-content" class="hidden w-full h-full flex items-center justify-center"></div>
+                    </div>
+                </div>
+
+                <!-- 4 Draggable Picture Options Grid -->
+                <div id="matching-options" class="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 flex-1 min-h-0 my-2">
+                    <!-- Populated by JS -->
+                </div>
+
+                <!-- Feedback Banner & Next Button Footer -->
+                <div class="shrink-0 flex items-center justify-between gap-2 mt-1 min-h-[44px]">
+                    <div id="matching-feedback" class="hidden flex-1 p-2 md:p-3 rounded-xl text-center font-extrabold text-xs md:text-base border-2 shadow-sm truncate">
+                        <!-- Populated on choice -->
+                    </div>
+                    <button id="btn-next-matching" onclick="nextMatchingQuestion()" class="hidden shrink-0 px-5 py-2 md:px-7 md:py-2.5 bg-amber-500 text-white font-extrabold rounded-xl hover:bg-amber-600 transition shadow text-sm md:text-lg">
+                        Next ➡️
+                    </button>
+                </div>
+            </div>
+
+            <!-- Matching Completion Screen -->
+            <div id="matching-results" class="hidden flex-1 min-h-0 flex flex-col justify-center items-center text-center my-auto p-4">
+                <div class="text-6xl md:text-8xl mb-2 bouncy">🧩</div>
+                <h3 class="text-2xl md:text-4xl font-extrabold text-amber-600 mb-2">Drag & Drop Champion!</h3>
+                <p class="text-slate-700 font-extrabold text-base md:text-2xl mb-4">You matched all the computers to their functions!</p>
+                <div class="bg-amber-50 border-4 border-amber-200 rounded-2xl p-4 max-w-sm w-full mb-4 shadow-inner">
+                    <p class="text-slate-500 uppercase font-extrabold text-xs tracking-wider">Your Score</p>
+                    <p id="final-matching-score" class="text-4xl md:text-6xl font-extrabold text-amber-600 my-1">5 / 5</p>
+                    <p class="text-amber-800 font-extrabold text-sm md:text-base">Outstanding job!</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="restartMatchingGame()" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-base md:text-lg rounded-xl transition shadow">
+                        🔄 Play Again
+                    </button>
+                    <button onclick="switchMode('quiz')" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-base md:text-lg rounded-xl transition shadow">
+                        ⭐ "What Am I?" Riddles 🚀
+                    </button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ================= MODE 3: "WHAT AM I?" RIDDLE QUIZ (1 Q / Slide) ================= -->
+        <section id="section-quiz" class="hidden flex-1 min-h-0 bg-white/95 rounded-2xl md:rounded-3xl p-3 md:p-5 shadow-xl border-2 md:border-4 border-emerald-200 flex flex-col justify-between overflow-hidden">
+            <!-- Quiz Header -->
+            <div id="quiz-header" class="flex justify-between items-center border-b-2 border-dashed border-emerald-200 pb-2 shrink-0">
+                <div>
+                    <span class="bg-emerald-100 text-emerald-900 font-extrabold px-3 py-1 rounded-full text-xs md:text-sm">
+                        Activity 2: "What Am I?" Riddles ⭐
+                    </span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span id="quiz-question-num" class="font-extrabold text-slate-600 text-xs md:text-base">Riddle 1 of 5</span>
+                    <div id="quiz-stars" class="flex gap-1 text-base md:text-xl text-amber-400">
+                        <span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Quiz Area -->
+            <div id="quiz-container" class="flex-1 min-h-0 flex flex-col justify-between my-1 overflow-hidden">
+                <!-- Question Prompt Banner -->
+                <div class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-3 py-2 md:px-5 md:py-3 rounded-2xl shadow-md text-center border-2 border-emerald-300 shrink-0 mb-2">
+                    <p id="quiz-question-text" class="text-base md:text-2xl font-extrabold leading-snug">
+                        Loading riddle...
+                    </p>
+                </div>
+
+                <!-- 4 Large Picture Options Grid -->
+                <div id="quiz-options" class="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 flex-1 min-h-0 my-1">
+                    <!-- Populated by JS -->
+                </div>
+
+                <!-- Feedback Banner & Next Button Footer -->
+                <div class="shrink-0 flex items-center justify-between gap-2 mt-1 min-h-[44px]">
+                    <div id="quiz-feedback" class="hidden flex-1 p-2 md:p-3 rounded-xl text-center font-extrabold text-xs md:text-base border-2 shadow-sm truncate">
+                        <!-- Populated on choice -->
+                    </div>
+                    <button id="btn-next-question" onclick="nextQuestion()" class="hidden shrink-0 px-6 py-2.5 bg-emerald-500 text-white font-extrabold rounded-xl hover:bg-emerald-600 transition shadow text-base md:text-xl">
+                        Next Riddle ➡️
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Results Screen -->
+            <div id="quiz-results" class="hidden flex-1 min-h-0 flex flex-col justify-center items-center text-center my-auto p-4">
+                <div class="text-6xl md:text-8xl mb-2 bouncy">🏆</div>
+                <h3 class="text-2xl md:text-4xl font-extrabold text-emerald-700 mb-2">Computer Genius Champion!</h3>
+                <p class="text-slate-700 font-extrabold text-base md:text-2xl mb-4">You solved all 5 "What Am I?" computer riddles!</p>
+                <div class="bg-emerald-50 border-4 border-emerald-200 rounded-2xl p-4 max-w-sm w-full mb-4 shadow-inner">
+                    <p class="text-slate-500 uppercase font-extrabold text-xs tracking-wider">Final Score</p>
+                    <p id="final-score-text" class="text-4xl md:text-6xl font-extrabold text-emerald-600 my-1">5 / 5</p>
+                    <p class="text-emerald-800 font-extrabold text-sm md:text-base">Amazing job!</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="restartQuiz()" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-base md:text-lg rounded-xl transition shadow">
+                        🔄 Play Again
+                    </button>
+                    <button onclick="switchMode('slides')" class="px-5 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-extrabold text-base md:text-lg rounded-xl transition shadow">
+                        📖 Lesson Slides
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full text-center text-[10px] md:text-xs text-slate-500 font-bold shrink-0 py-0.5">
+        Year 1 Computing • Types of Computers & Functions
+    </footer>
+
+    <script>
+        // Web Audio Synthesizer for instant, reliable audio feedback
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+
+        function playSound(type) {
+            try {
+                if (!audioCtx) audioCtx = new AudioContext();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(450, now);
+                    osc.frequency.exponentialRampToValueAtTime(900, now + 0.08);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                } else if (type === 'correct') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.1);
+                    osc.frequency.setValueAtTime(783.99, now + 0.2);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(240, now);
+                    osc.frequency.setValueAtTime(180, now + 0.12);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'fanfare') {
+                    const notes = [400, 500, 600, 800, 1000];
+                    notes.forEach((freq, idx) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.type = 'triangle';
+                        o.frequency.setValueAtTime(freq, now + idx * 0.1);
+                        g.gain.setValueAtTime(0.25, now + idx * 0.1);
+                        g.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.1 + 0.25);
+                        o.start(now + idx * 0.1);
+                        o.stop(now + idx * 0.1 + 0.25);
+                    });
+                }
+            } catch (e) {
+                console.log("Audio play exception:", e);
+            }
+        }
+
+        /* Presentation Slides Data */
+        const presentationSlides = [
+            {
+                title: "Welcome to Computer World! 🤖",
+                content: `
+                    <div class="flex flex-col items-center justify-center text-center h-full my-auto">
+                        <span class="text-7xl md:text-9xl my-2 bouncy">🖥️</span>
+                        <h2 class="text-2xl md:text-4xl font-extrabold text-sky-600 mb-2">What is a Computer?</h2>
+                        <p class="text-xl md:text-3xl text-slate-800 font-extrabold max-w-3xl leading-relaxed">
+                            A computer is a <span class="bg-amber-200 px-3 py-1 rounded-2xl text-amber-900 border-2 border-amber-300">smart machine</span> that helps us learn, play games, draw art, and watch cartoons!
+                        </p>
+                    </div>
+                `
+            },
+            {
+                title: "Desktop Computer 🖥️",
+                content: `
+                    <div class="flex flex-col items-center justify-center text-center h-full my-auto w-full">
+                        <span class="text-6xl md:text-8xl mb-2">🖥️</span>
+                        <p class="text-lg md:text-2xl font-extrabold text-sky-900 bg-sky-100 px-4 py-2 rounded-2xl mb-3 border-2 border-sky-300 max-w-3xl">
+                            Stays in one place on your desk! Large and strong. You cannot carry it around easily.
+                        </p>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 font-extrabold text-slate-800 w-full max-w-4xl text-sm md:text-xl">
+                            <div class="bg-sky-50 border-2 border-sky-300 p-2 md:p-3 rounded-2xl flex flex-col items-center">
+                                <span class="text-3xl md:text-5xl">📺</span>
+                                <span>Monitor</span>
+                            </div>
+                            <div class="bg-sky-50 border-2 border-sky-300 p-2 md:p-3 rounded-2xl flex flex-col items-center">
+                                <span class="text-3xl md:text-5xl">⌨️</span>
+                                <span>Keyboard</span>
+                            </div>
+                            <div class="bg-sky-50 border-2 border-sky-300 p-2 md:p-3 rounded-2xl flex flex-col items-center">
+                                <span class="text-3xl md:text-5xl">🖱️</span>
+                                <span>Mouse</span>
+                            </div>
+                            <div class="bg-sky-50 border-2 border-sky-300 p-2 md:p-3 rounded-2xl flex flex-col items-center">
+                                <span class="text-3xl md:text-5xl">🔲</span>
+                                <span>CPU Box</span>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Laptop Computer 💻",
+                content: `
+                    <div class="flex flex-col items-center justify-center text-center h-full my-auto max-w-3xl">
+                        <span class="text-7xl md:text-9xl mb-2">💻</span>
+                        <h3 class="text-xl md:text-3xl font-extrabold text-amber-600 mb-2">Folds closed like a notebook!</h3>
+                        <p class="text-slate-800 font-extrabold text-lg md:text-2xl leading-relaxed mb-4">
+                            Smaller than a desktop. You can carry it in your backpack to do schoolwork or play games anywhere!
+                        </p>
+                        <span class="bg-amber-100 text-amber-900 text-base md:text-xl font-extrabold px-6 py-2 rounded-full border-2 border-amber-300 shadow">🎒 Portable • Fits in a bag</span>
+                    </div>
+                `
+            },
+            {
+                title: "Tablet Computer 📱",
+                content: `
+                    <div class="flex flex-col items-center justify-center text-center h-full my-auto max-w-3xl">
+                        <span class="text-7xl md:text-9xl mb-2">📱</span>
+                        <h3 class="text-xl md:text-3xl font-extrabold text-purple-600 mb-2">Touch Screen Tablet</h3>
+                        <p class="text-lg md:text-2xl text-slate-800 font-extrabold mb-4">Smaller than a laptop. You tap and swipe the screen directly with your finger!</p>
+                        <span class="bg-purple-100 text-purple-900 text-base md:text-xl font-extrabold px-6 py-2 rounded-full border-2 border-purple-300 shadow">👆 Touch & Tap Screen</span>
+                    </div>
+                `
+            },
+            {
+                title: "What Can a Tablet Do? 🎨",
+                content: `
+                    <div class="flex flex-col items-center justify-center text-center h-full my-auto w-full max-w-4xl">
+                        <h3 class="text-xl md:text-3xl font-extrabold text-purple-700 mb-3">Functions of a Tablet:</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm md:text-lg font-extrabold w-full">
+                            <span class="bg-purple-50 border-2 border-purple-200 p-3 rounded-2xl flex flex-col items-center"><span class="text-4xl md:text-5xl">🎬</span> <span>Watch Movies</span></span>
+                            <span class="bg-pink-50 border-2 border-pink-200 p-3 rounded-2xl flex flex-col items-center"><span class="text-4xl md:text-5xl">🎨</span> <span>Draw Art</span></span>
+                            <span class="bg-blue-50 border-2 border-blue-200 p-3 rounded-2xl flex flex-col items-center"><span class="text-4xl md:text-5xl">📷</span> <span>Take Photos</span></span>
+                            <span class="bg-emerald-50 border-2 border-emerald-200 p-3 rounded-2xl flex flex-col items-center"><span class="text-4xl md:text-5xl">📖</span> <span>Read Books</span></span>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Smartphone & Its Special Function 📲",
+                content: `
+                    <div class="flex flex-col items-center justify-center text-center h-full my-auto max-w-3xl">
+                        <span class="text-7xl md:text-9xl mb-2">📲</span>
+                        <h3 class="text-xl md:text-3xl font-extrabold text-emerald-600 mb-2">Pocket Computer!</h3>
+                        <p class="text-slate-800 font-extrabold text-lg md:text-2xl mb-3">Smaller than a tablet. Fits right in your pocket!</p>
+                        <div class="bg-emerald-100 border-2 border-emerald-400 rounded-2xl p-4 text-base md:text-2xl font-extrabold text-emerald-900 w-full space-y-2 shadow">
+                            <p>📞 <strong>Makes Phone Calls anywhere!</strong></p>
+                            <p>📸 Takes Photos & Videos</p>
+                            <p>🎮 Plays Games & Music on the Go</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "What Can Computers Do? 🌟",
+                content: `
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 w-full max-w-4xl my-auto">
+                        <div class="bg-rose-50 border-2 border-rose-200 rounded-2xl p-3 text-center flex flex-col items-center">
+                            <span class="text-5xl md:text-7xl">🎬</span>
+                            <p class="font-extrabold text-base md:text-xl text-rose-800 mt-2">Watch Movies</p>
+                        </div>
+                        <div class="bg-indigo-50 border-2 border-indigo-200 rounded-2xl p-3 text-center flex flex-col items-center">
+                            <span class="text-5xl md:text-7xl">🎮</span>
+                            <p class="font-extrabold text-base md:text-xl text-indigo-800 mt-2">Play Games</p>
+                        </div>
+                        <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-3 text-center flex flex-col items-center">
+                            <span class="text-5xl md:text-7xl">📖</span>
+                            <p class="font-extrabold text-base md:text-xl text-amber-800 mt-2">Read & Learn</p>
+                        </div>
+                        <div class="bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-3 text-center flex flex-col items-center">
+                            <span class="text-5xl md:text-7xl">🎨</span>
+                            <p class="font-extrabold text-base md:text-xl text-emerald-800 mt-2">Draw & Create</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Computer Friends Activity! 🤝",
+                content: `
+                    <div class="bg-yellow-50 border-2 border-yellow-300 rounded-2xl p-5 text-center max-w-2xl my-auto shadow">
+                        <span class="text-6xl md:text-8xl mb-2 inline-block">🗣️</span>
+                        <h3 class="text-xl md:text-3xl font-extrabold text-amber-800 mb-2">Think - Pair - Share!</h3>
+                        <p class="text-lg md:text-2xl font-extrabold text-slate-800 leading-relaxed space-y-1">
+                            1. Think about your favorite computer.<br>
+                            2. Turn to a partner.<br>
+                            3. Share what functions you use it for!
+                        </p>
+                    </div>
+                `
+            }
+        ];
+
+        let currentSlide = 0;
+
+        function renderSlide() {
+            const slide = presentationSlides[currentSlide];
+            document.getElementById('slide-badge').innerText = `Slide ${currentSlide + 1} of ${presentationSlides.length}`;
+            
+            // Render Dots
+            const dotsContainer = document.getElementById('slide-dots');
+            dotsContainer.innerHTML = presentationSlides.map((_, idx) => `
+                <div class="w-2.5 h-2.5 md:w-3.5 md:h-3.5 rounded-full ${idx === currentSlide ? 'bg-sky-500 scale-125' : 'bg-sky-200'} transition-all"></div>
+            `).join('');
+
+            // Render Content
+            document.getElementById('slide-content').innerHTML = `
+                <h2 class="text-xl md:text-3xl font-extrabold text-sky-700 mb-2 shrink-0">${slide.title}</h2>
+                <div class="flex-1 min-h-0 flex flex-col justify-center items-center w-full">${slide.content}</div>
+            `;
+
+            document.getElementById('btn-prev-slide').disabled = currentSlide === 0;
+            document.getElementById('btn-prev-slide').style.opacity = currentSlide === 0 ? "0.4" : "1";
+        }
+
+        function changeSlide(direction) {
+            playSound('click');
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= presentationSlides.length) currentSlide = presentationSlides.length - 1;
+            renderSlide();
+        }
+
+
+        /* Activity 1: Drag and Drop Matching Questions */
+        const matchingQuestions = [
+            {
+                prompt: "Which device stays on your desk with a monitor, keyboard, mouse & CPU box?",
+                rationale: "Correct! The Desktop Computer stays in one place on your desk!",
+                options: [
+                    { id: "desktop", text: "Desktop Computer", icon: "🖥️", isCorrect: true },
+                    { id: "laptop", text: "Laptop Computer", icon: "💻", isCorrect: false },
+                    { id: "tablet", text: "Tablet Computer", icon: "📱", isCorrect: false },
+                    { id: "smartphone", text: "Smartphone", icon: "📲", isCorrect: false }
+                ]
+            },
+            {
+                prompt: "Which one folds closed like a notebook so you can carry it in your backpack?",
+                rationale: "Correct! The Laptop folds closed so you can carry it in your backpack!",
+                options: [
+                    { id: "tablet", text: "Tablet Computer", icon: "📱", isCorrect: false },
+                    { id: "laptop", text: "Laptop Computer", icon: "💻", isCorrect: true },
+                    { id: "desktop", text: "Desktop Computer", icon: "🖥️", isCorrect: false },
+                    { id: "smartphone", text: "Smartphone", icon: "📲", isCorrect: false }
+                ]
+            },
+            {
+                prompt: "Which touch screen device is used to draw art, read books & watch cartoons?",
+                rationale: "Correct! The Tablet is a touch screen computer for drawing & reading!",
+                options: [
+                    { id: "desktop", text: "Desktop Computer", icon: "🖥️", isCorrect: false },
+                    { id: "smartphone", text: "Smartphone", icon: "📲", isCorrect: false },
+                    { id: "tablet", text: "Tablet Computer", icon: "📱", isCorrect: true },
+                    { id: "laptop", text: "Laptop Computer", icon: "💻", isCorrect: false }
+                ]
+            },
+            {
+                prompt: "Which small pocket device CAN MAKE PHONE CALLS anywhere?",
+                rationale: "Correct! The Smartphone fits in your pocket and makes phone calls!",
+                options: [
+                    { id: "smartphone", text: "Smartphone", icon: "📲", isCorrect: true },
+                    { id: "tablet", text: "Tablet Computer", icon: "📱", isCorrect: false },
+                    { id: "laptop", text: "Laptop Computer", icon: "💻", isCorrect: false },
+                    { id: "desktop", text: "Desktop Computer", icon: "🖥️", isCorrect: false }
+                ]
+            },
+            {
+                prompt: "Which SMART MACHINE helps us learn, play games & watch cartoons?",
+                rationale: "Correct! A computer is a smart machine that helps us learn and play!",
+                options: [
+                    { id: "smartmachine", text: "Smart Computer", icon: "🤖", isCorrect: true },
+                    { id: "monitor", text: "Monitor Screen", icon: "📺", isCorrect: false },
+                    { id: "keyboard", text: "Keyboard", icon: "⌨️", isCorrect: false },
+                    { id: "mouse", text: "Computer Mouse", icon: "🖱️", isCorrect: false }
+                ]
+            }
+        ];
+
+        let currentMatchingIndex = 0;
+        let matchingScore = 0;
+        let matchingAnswered = false;
+        let draggedOptionIndex = null;
+
+        function initMatchingGame() {
+            currentMatchingIndex = 0;
+            matchingScore = 0;
+            matchingAnswered = false;
+            document.getElementById('matching-results').classList.add('hidden');
+            document.getElementById('matching-container').classList.remove('hidden');
+            document.getElementById('matching-header').classList.remove('hidden');
+            loadMatchingQuestion();
+        }
+
+        function loadMatchingQuestion() {
+            matchingAnswered = false;
+            draggedOptionIndex = null;
+            const q = matchingQuestions[currentMatchingIndex];
+
+            document.getElementById('matching-slide-num').innerText = `Question ${currentMatchingIndex + 1} of ${matchingQuestions.length}`;
+            document.getElementById('matching-prompt-text').innerText = q.prompt;
+            document.getElementById('matching-feedback').classList.add('hidden');
+            document.getElementById('btn-next-matching').classList.add('hidden');
+
+            // Reset Drop Zone
+            const dropTarget = document.getElementById('drop-target-zone');
+            dropTarget.className = "w-full md:w-64 h-20 md:h-24 border-4 border-dashed border-white/90 bg-amber-500/40 rounded-2xl flex flex-col items-center justify-center text-center transition-all pulse-target shrink-0 p-1";
+            document.getElementById('drop-zone-placeholder').classList.remove('hidden');
+            document.getElementById('drop-zone-content').classList.add('hidden');
+            document.getElementById('drop-zone-content').innerHTML = '';
+
+            // Render Dots
+            const dotsContainer = document.getElementById('matching-progress-dots');
+            dotsContainer.innerHTML = matchingQuestions.map((_, idx) => `
+                <div class="w-2.5 h-2.5 md:w-3.5 md:h-3.5 rounded-full ${idx === currentMatchingIndex ? 'bg-amber-500 scale-125' : 'bg-amber-200'} transition-all"></div>
+            `).join('');
+
+            // Render 4 Draggable Picture Options
+            const optionsContainer = document.getElementById('matching-options');
+            optionsContainer.innerHTML = q.options.map((opt, idx) => `
+                <div id="drag-opt-${idx}"
+                     draggable="true" 
+                     ondragstart="handleDragStart(event, ${idx})"
+                     onclick="handleOptionTap(${idx})"
+                     class="draggable-card group bg-slate-50 border-2 md:border-4 border-slate-200 hover:border-amber-400 hover:bg-amber-50 rounded-2xl md:rounded-3xl p-2 md:p-3 flex flex-col items-center justify-center text-center transition-all duration-150 shadow hover:shadow-lg cursor-grab h-full min-h-0 w-full overflow-hidden">
+                    <div class="flex-1 min-h-0 w-full bg-white rounded-xl md:rounded-2xl border-2 border-slate-100 flex items-center justify-center text-5xl md:text-7xl lg:text-8xl my-1 group-hover:scale-105 transition-transform pointer-events-none">
+                        ${opt.icon}
+                    </div>
+                    <span class="text-xs md:text-lg font-extrabold text-slate-800 group-hover:text-amber-800 shrink-0 mt-1 pointer-events-none">${opt.text}</span>
+                </div>
+            `).join('');
+        }
+
+        /* Drag and Drop Handlers */
+        function handleDragStart(e, index) {
+            if (matchingAnswered) return;
+            draggedOptionIndex = index;
+            e.dataTransfer.setData("text/plain", index);
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            if (matchingAnswered) return;
+            document.getElementById('drop-target-zone').classList.add('bg-amber-300/80', 'scale-105');
+        }
+
+        function handleDragLeave(e) {
+            if (matchingAnswered) return;
+            document.getElementById('drop-target-zone').classList.remove('bg-amber-300/80', 'scale-105');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            if (matchingAnswered) return;
+            document.getElementById('drop-target-zone').classList.remove('bg-amber-300/80', 'scale-105');
+            
+            let idx = draggedOptionIndex;
+            if (idx === null || idx === undefined) {
+                idx = parseInt(e.dataTransfer.getData("text/plain"), 10);
+            }
+            if (!isNaN(idx)) {
+                processMatchingAnswer(idx);
+            }
+        }
+
+        // Tap fallback for touch screens
+        function handleOptionTap(index) {
+            if (matchingAnswered) return;
+            processMatchingAnswer(index);
+        }
+
+        function processMatchingAnswer(selectedIndex) {
+            if (matchingAnswered) return;
+            matchingAnswered = true;
+
+            const q = matchingQuestions[currentMatchingIndex];
+            const selectedOpt = q.options[selectedIndex];
+
+            // Render selected option in drop box
+            const dropTarget = document.getElementById('drop-target-zone');
+            document.getElementById('drop-zone-placeholder').classList.add('hidden');
+            const dropContent = document.getElementById('drop-zone-content');
+            dropContent.classList.remove('hidden');
+            dropContent.innerHTML = `
+                <div class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border-2 shadow-md">
+                    <span class="text-3xl md:text-4xl">${selectedOpt.icon}</span>
+                    <span class="text-xs md:text-sm font-extrabold text-slate-800">${selectedOpt.text}</span>
+                </div>
+            `;
+
+            const cards = document.querySelectorAll('.draggable-card');
+            cards.forEach((card, idx) => {
+                card.draggable = false;
+                card.classList.remove('cursor-grab', 'hover:border-amber-400');
+                if (q.options[idx].isCorrect) {
+                    card.classList.add('bg-emerald-100', 'border-emerald-500', 'ring-4', 'ring-emerald-300');
+                } else if (idx === selectedIndex) {
+                    card.classList.add('bg-rose-100', 'border-rose-400', 'ring-4', 'ring-rose-200');
+                } else {
+                    card.classList.add('opacity-40');
+                }
+            });
+
+            const feedbackEl = document.getElementById('matching-feedback');
+            feedbackEl.classList.remove('hidden');
+
+            if (selectedOpt.isCorrect) {
+                playSound('correct');
+                if (typeof confetti === 'function') confetti({ particleCount: 50, spread: 70, origin: { y: 0.8 } });
+                matchingScore++;
+                dropTarget.className = "w-full md:w-64 h-20 md:h-24 border-4 border-emerald-400 bg-emerald-500/40 rounded-2xl flex flex-col items-center justify-center text-center shrink-0 p-1 shadow-lg";
+                feedbackEl.className = "flex-1 p-2 md:p-3 rounded-xl text-center font-extrabold text-xs md:text-base border-2 bg-emerald-100 border-emerald-400 text-emerald-900 shadow-sm truncate";
+                feedbackEl.innerText = `🎉 ${q.rationale}`;
+            } else {
+                playSound('wrong');
+                dropTarget.className = "w-full md:w-64 h-20 md:h-24 border-4 border-rose-400 bg-rose-500/40 rounded-2xl flex flex-col items-center justify-center text-center shrink-0 p-1 shadow-lg";
+                feedbackEl.className = "flex-1 p-2 md:p-3 rounded-xl text-center font-extrabold text-xs md:text-base border-2 bg-rose-100 border-rose-400 text-rose-900 shadow-sm truncate";
+                feedbackEl.innerText = `💡 Try again! ${q.rationale}`;
+            }
+
+            document.getElementById('btn-next-matching').classList.remove('hidden');
+        }
+
+        function nextMatchingQuestion() {
+            playSound('click');
+            currentMatchingIndex++;
+            if (currentMatchingIndex < matchingQuestions.length) {
+                loadMatchingQuestion();
+            } else {
+                showMatchingResults();
+            }
+        }
+
+        function showMatchingResults() {
+            playSound('fanfare');
+            document.getElementById('matching-container').classList.add('hidden');
+            document.getElementById('matching-header').classList.add('hidden');
+            document.getElementById('matching-results').classList.remove('hidden');
+            document.getElementById('final-matching-score').innerText = `${matchingScore} / ${matchingQuestions.length}`;
+        }
+
+        function restartMatchingGame() {
+            playSound('click');
+            initMatchingGame();
+        }
+
+
+        /* Activity 2: "What Am I?" Riddle Questions */
+        const quizQuestions = [
+            {
+                question: "I sit on your desk and cannot be carried around. I have a separate monitor, keyboard, and mouse. What am I?",
+                options: [
+                    { icon: "🖥️", text: "Desktop Computer", isCorrect: true, rationale: "Desktop computers stay on your desk!" },
+                    { icon: "💻", text: "Laptop Computer", isCorrect: false, rationale: "Laptops fold closed and carry in a backpack." },
+                    { icon: "📱", text: "Tablet Computer", isCorrect: false, rationale: "Tablets are touch screens you carry around." },
+                    { icon: "📲", text: "Smartphone", isCorrect: false, rationale: "Smartphones fit in your pocket!" }
+                ]
+            },
+            {
+                question: "I am smaller than a desktop. I fold open like a notebook, have a keyboard attached, and fit in your backpack. What am I?",
+                options: [
+                    { icon: "💻", text: "Laptop Computer", isCorrect: true, rationale: "Laptops fold open like a notebook!" },
+                    { icon: "🖥️", text: "Desktop Computer", isCorrect: false, rationale: "Desktops are too large to fit in backpacks." },
+                    { icon: "📱", text: "Tablet Computer", isCorrect: false, rationale: "Tablets do not fold open." },
+                    { icon: "🤖", text: "Smart Machine", isCorrect: false, rationale: "Robots do not fold closed." }
+                ]
+            },
+            {
+                question: "I am a portable touch screen! You tap me with your fingers to draw art, play games, read books & watch movies. What am I?",
+                options: [
+                    { icon: "🖥️", text: "Desktop Computer", isCorrect: false, rationale: "Desktops stay on desks and use a mouse." },
+                    { icon: "📱", text: "Tablet Computer", isCorrect: true, rationale: "Tablets have touch screens for drawing & movies!" },
+                    { icon: "📲", text: "Smartphone", isCorrect: false, rationale: "Smartphones are smaller pocket devices." },
+                    { icon: "💻", text: "Laptop Computer", isCorrect: false, rationale: "Laptops open up with a physical keyboard." }
+                ]
+            },
+            {
+                question: "I am a small pocket computer! I have a touch screen, take photos, and I CAN CALL your family! What am I?",
+                options: [
+                    { icon: "📲", text: "Smartphone", isCorrect: true, rationale: "Smartphones fit in pockets and make phone calls!" },
+                    { icon: "📱", text: "Tablet Computer", isCorrect: false, rationale: "Tablets are too big for small pockets." },
+                    { icon: "💻", text: "Laptop Computer", isCorrect: false, rationale: "Laptops cannot fit in pockets!" },
+                    { icon: "🖥️", text: "Desktop Computer", isCorrect: false, rationale: "Desktops stay on desks." }
+                ]
+            },
+            {
+                question: "I am a smart machine that helps you learn, draw art, listen to music, and play fun games! What am I?",
+                options: [
+                    { icon: "🤖", text: "Computer", isCorrect: true, rationale: "A computer is a smart machine that helps us learn & play!" },
+                    { icon: "📺", text: "Screen Only", isCorrect: false, rationale: "A screen only displays pictures." },
+                    { icon: "🔌", text: "Power Cable", isCorrect: false, rationale: "Power cables only bring electricity." },
+                    { icon: "🖨️", text: "Printer", isCorrect: false, rationale: "Printers only print paper." }
+                ]
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let quizScore = 0;
+        let answered = false;
+
+        function loadQuestion() {
+            answered = false;
+            const q = quizQuestions[currentQuestionIndex];
+            
+            document.getElementById('quiz-question-num').innerText = `Riddle ${currentQuestionIndex + 1} of ${quizQuestions.length}`;
+            document.getElementById('quiz-question-text').innerText = q.question;
+            document.getElementById('quiz-feedback').classList.add('hidden');
+            document.getElementById('btn-next-question').classList.add('hidden');
+
+            // Render 4 Options
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = q.options.map((opt, idx) => `
+                <button onclick="selectAnswer(${idx})" 
+                        class="quiz-opt-btn group bg-slate-50 border-2 md:border-4 border-slate-200 hover:border-emerald-400 hover:bg-emerald-50 rounded-2xl md:rounded-3xl p-2 md:p-3 flex flex-col items-center justify-center text-center transition-all duration-150 shadow hover:shadow-lg cursor-pointer h-full min-h-0 w-full overflow-hidden">
+                    <div class="flex-1 min-h-0 w-full bg-white rounded-xl md:rounded-2xl border-2 border-slate-100 flex items-center justify-center text-5xl md:text-7xl lg:text-8xl my-1 group-hover:scale-105 transition-transform">
+                        ${opt.icon}
+                    </div>
+                    <span class="text-xs md:text-lg font-extrabold text-slate-800 group-hover:text-emerald-800 shrink-0 mt-1">${opt.text}</span>
+                </button>
+            `).join('');
+        }
+
+        function selectAnswer(selectedIndex) {
+            if (answered) return;
+            answered = true;
+
+            const q = quizQuestions[currentQuestionIndex];
+            const selectedOpt = q.options[selectedIndex];
+            const buttons = document.querySelectorAll('.quiz-opt-btn');
+
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                btn.classList.remove('hover:border-emerald-400', 'cursor-pointer');
+                if (q.options[idx].isCorrect) {
+                    btn.classList.add('bg-emerald-100', 'border-emerald-500', 'ring-4', 'ring-emerald-300');
+                    btn.querySelector('span').classList.add('text-emerald-900');
+                } else if (idx === selectedIndex) {
+                    btn.classList.add('bg-rose-100', 'border-rose-400', 'ring-4', 'ring-rose-200');
+                    btn.querySelector('span').classList.add('text-rose-900');
+                } else {
+                    btn.classList.add('opacity-40');
+                }
+            });
+
+            const feedbackEl = document.getElementById('quiz-feedback');
+            feedbackEl.classList.remove('hidden');
+
+            if (selectedOpt.isCorrect) {
+                playSound('correct');
+                if (typeof confetti === 'function') confetti({ particleCount: 50, spread: 70, origin: { y: 0.8 } });
+                quizScore++;
+                feedbackEl.className = "flex-1 p-2 md:p-3 rounded-xl text-center font-extrabold text-xs md:text-base border-2 bg-emerald-100 border-emerald-400 text-emerald-900 shadow-sm truncate";
+                feedbackEl.innerText = `🎉 ${selectedOpt.rationale}`;
+            } else {
+                playSound('wrong');
+                feedbackEl.className = "flex-1 p-2 md:p-3 rounded-xl text-center font-extrabold text-xs md:text-base border-2 bg-rose-100 border-rose-400 text-rose-900 shadow-sm truncate";
+                feedbackEl.innerText = `💡 ${selectedOpt.rationale}`;
+            }
+
+            document.getElementById('btn-next-question').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            playSound('click');
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizQuestions.length) {
+                loadQuestion();
+            } else {
+                showQuizResults();
+            }
+        }
+
+        function showQuizResults() {
+            playSound('fanfare');
+            document.getElementById('quiz-container').classList.add('hidden');
+            document.getElementById('quiz-header').classList.add('hidden');
+            document.getElementById('quiz-results').classList.remove('hidden');
+            document.getElementById('final-score-text').innerText = `${quizScore} / ${quizQuestions.length}`;
+        }
+
+        function restartQuiz() {
+            playSound('click');
+            currentQuestionIndex = 0;
+            quizScore = 0;
+            document.getElementById('quiz-results').classList.add('hidden');
+            document.getElementById('quiz-container').classList.remove('hidden');
+            document.getElementById('quiz-header').classList.remove('hidden');
+            loadQuestion();
+        }
+
+
+        /* Navigation Tab Switching Logic */
+        function switchMode(mode) {
+            playSound('click');
+
+            document.getElementById('section-slides').classList.add('hidden');
+            document.getElementById('section-matching').classList.add('hidden');
+            document.getElementById('section-quiz').classList.add('hidden');
+
+            document.getElementById('tab-slides').className = "px-3 py-1.5 md:px-5 md:py-2 rounded-xl font-extrabold text-xs md:text-base text-slate-700 bg-sky-100 hover:bg-sky-200 transition shadow flex items-center gap-1.5";
+            document.getElementById('tab-matching').className = "px-3 py-1.5 md:px-5 md:py-2 rounded-xl font-extrabold text-xs md:text-base text-slate-700 bg-amber-100 hover:bg-amber-200 transition shadow flex items-center gap-1.5";
+            document.getElementById('tab-quiz').className = "px-3 py-1.5 md:px-5 md:py-2 rounded-xl font-extrabold text-xs md:text-base text-slate-700 bg-emerald-100 hover:bg-emerald-200 transition shadow flex items-center gap-1.5";
+
+            if (mode === 'slides') {
+                document.getElementById('section-slides').classList.remove('hidden');
+                document.getElementById('tab-slides').className = "px-3 py-1.5 md:px-5 md:py-2 rounded-xl font-extrabold text-xs md:text-base text-white bg-sky-500 hover:bg-sky-600 transition shadow flex items-center gap-1.5";
+            } else if (mode === 'matching') {
+                document.getElementById('section-matching').classList.remove('hidden');
+                document.getElementById('tab-matching').className = "px-3 py-1.5 md:px-5 md:py-2 rounded-xl font-extrabold text-xs md:text-base text-white bg-amber-500 hover:bg-amber-600 transition shadow flex items-center gap-1.5";
+                initMatchingGame();
+            } else if (mode === 'quiz') {
+                document.getElementById('section-quiz').classList.remove('hidden');
+                document.getElementById('tab-quiz').className = "px-3 py-1.5 md:px-5 md:py-2 rounded-xl font-extrabold text-xs md:text-base text-white bg-emerald-500 hover:bg-emerald-600 transition shadow flex items-center gap-1.5";
+                restartQuiz();
+            }
+        }
+
+        // Initialize App on DOM load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderSlide();
+        });
+    </script>
+</body>
+</html>
