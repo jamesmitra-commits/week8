@@ -483,6 +483,46 @@ p, li {
   box-shadow: 0 5px 0 #dc2626 !important;
 }
 
+/* Special Compact Styling for Slide 19 to fit all 3 questions */
+#slide19 {
+  padding-top: 25px;
+  padding-bottom: 70px;
+}
+
+#slide19 .slide-title {
+  margin-bottom: 10px;
+}
+
+#slide19 .mcq-container {
+  gap: 10px;
+}
+
+#slide19 .mcq-question {
+  padding: 10px 18px;
+  border-width: 3px;
+  box-shadow: 0 4px 0 #93c5fd;
+}
+
+#slide19 .mcq-question h3 {
+  font-size: 19px !important;
+  margin-bottom: 0;
+}
+
+#slide19 .mcq-options {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+#slide19 .mcq-btn {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 16px;
+  border-width: 3px;
+  box-shadow: 0 3px 0 #94a3b8;
+}
+
 /* Leaderboard & Certificates */
 .cert-card {
   background: #ffffff;
@@ -1327,7 +1367,7 @@ p, li {
     </div>
 </div>
 
-<!-- SLIDE 19: IoT Quiz Time: Part 2 (Questions 3-5) -->
+<!-- SLIDE 19: IoT Quiz Time: Part 2 (Questions 3-5) FIXED COMPACT LAYOUT -->
 <div class="slide-container" id="slide19">
     <div class="score-banner"><i class="fa-solid fa-star"></i> Score: <span class="global-score">0</span> pts</div>
     <h2 class="slide-title"><i class="fa-solid fa-circle-question"></i> IoT Quiz Time: Part 2</h2>
@@ -1336,7 +1376,7 @@ p, li {
         <div class="mcq-container">
             <!-- Question 3 -->
             <div class="mcq-question" id="q3">
-                <h3 style="font-size: 22px; color: #0284c7;">Q3: Which IoT device helps doctors monitor patient heartbeats? (+10 pts)</h3>
+                <h3 style="color: #0284c7;">Q3: Which IoT device helps doctors monitor patient heartbeats? (+10 pts)</h3>
                 <div class="mcq-options">
                     <button class="mcq-btn" onclick="checkMCQ(this, true, 'q3')">A) Smart Heart Monitor</button>
                     <button class="mcq-btn" onclick="checkMCQ(this, false, 'q3')">B) Digital Price Tag</button>
@@ -1346,7 +1386,7 @@ p, li {
 
             <!-- Question 4 -->
             <div class="mcq-question" id="q4">
-                <h3 style="font-size: 22px; color: #0284c7;">Q4: Why are digital price tags in supermarkets useful? (+10 pts)</h3>
+                <h3 style="color: #0284c7;">Q4: Why are digital price tags in supermarkets useful? (+10 pts)</h3>
                 <div class="mcq-options">
                     <button class="mcq-btn" onclick="checkMCQ(this, false, 'q4')">A) They play music</button>
                     <button class="mcq-btn" onclick="checkMCQ(this, true, 'q4')">B) They update prices automatically over Wi-Fi</button>
@@ -1356,7 +1396,7 @@ p, li {
 
             <!-- Question 5 -->
             <div class="mcq-question" id="q5">
-                <h3 style="font-size: 22px; color: #0284c7;">Q5: What connects all IoT devices together? (+10 pts)</h3>
+                <h3 style="color: #0284c7;">Q5: What connects all IoT devices together? (+10 pts)</h3>
                 <div class="mcq-options">
                     <button class="mcq-btn" onclick="checkMCQ(this, false, 'q5')">A) String wires</button>
                     <button class="mcq-btn" onclick="checkMCQ(this, true, 'q5')">B) The Internet & Wireless Networks</button>
